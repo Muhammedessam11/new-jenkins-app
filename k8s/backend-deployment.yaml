@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: blog-backend
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: blog-backend
+  template:
+    metadata:
+      labels:
+        app: blog-backend
+    spec:
+      containers:
+        - name: blog-backend
+          image: mohamedessam1911/backend
+          ports:
+            - containerPort: 8000
+          env:
+            - name: DATABASE_URL
+              value: "mysql://root:<password>@mysql-service:3306/blog_db"
