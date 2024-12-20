@@ -2,6 +2,8 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: blog-backend
+  labels:
+    app: blog-backend
 spec:
   replicas: 2
   selector:
@@ -19,4 +21,28 @@ spec:
             - containerPort: 8000
           env:
             - name: DATABASE_URL
-              value: "mysql://root:<password>@mysql-service:3306/blog_db"
+              value: "mysql://root:$(DB_PASSWORD)@mysql-service:3306/blog_db"
+          envFrom:
+            - secretRef:
+                name: mysql-password
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 15
+            periodSeconds: 20
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "500m"
+            limits:
+              memory: "256Mi"
+              cpu: "1"
+          imagePullPolicy: IfNotPresent
+
